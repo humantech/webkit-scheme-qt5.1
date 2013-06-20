@@ -13,7 +13,7 @@ Just compile it using QtCreator and have some fun!
 ## Thanks to
 
 - The qt-webkit discussion group;
-- My pacience for reading Qt 5.1 source code;
+- My patience on reading the Qt 5.1 source code;
 - My employers for allowing me to develop this.
 
 ## License
