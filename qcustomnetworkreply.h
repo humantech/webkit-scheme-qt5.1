@@ -23,7 +23,7 @@ protected:
 
 private:
     struct QCustomNetworkReplyPrivate *d;
-
+    int position;
 };
 
 #endif // QCUSTOMNETWORKREPLY_H

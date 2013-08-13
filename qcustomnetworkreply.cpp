@@ -17,7 +17,7 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url)
     open(ReadOnly | Unbuffered);
 
     d = new QCustomNetworkReplyPrivate;
-
+    position = 0;
     setUrl(url);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,7 +90,8 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
     if (d->data.size() > 0)
     {
         qint64 number = qMin(maxSize, (qint64) d->data.size());
-        memcpy(data, d->data.constData(), number);
+        memcpy(data, d->data.constData()+position, number);
+        position += number;
         return number;
     }
     else
