@@ -8,6 +8,7 @@
 struct QCustomNetworkReplyPrivate
 {
     QByteArray data;
+    int offset;
 };
 
 QCustomNetworkReply::QCustomNetworkReply(const QUrl &url)
@@ -16,22 +17,23 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url)
     setFinished(true);
     open(ReadOnly | Unbuffered);
 
-    d = new QCustomNetworkReplyPrivate;
-    position = 0;
+    reply = new QCustomNetworkReplyPrivate;
+    reply->offset = 0;
+
     setUrl(url);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // tudo aqui mesmo? para testes ...
 
     setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/html; charset=UTF-8"));
-    setHeader(QNetworkRequest::ContentLengthHeader, QVariant(d->data.size()));
+    setHeader(QNetworkRequest::ContentLengthHeader, QVariant(reply->data.size()));
 
     QTimer::singleShot(0, this, SIGNAL(metaDataChanged()));
 
     setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
     setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, "OK");
     QString hasQuery = url.hasQuery() ? QString("yes") : QString("no");
-    d->data = QString("<html><body>"
+    reply->data = QString("<html><body>"
                       "<h1>This is not the coolest title</h1>"
                       "<p>You shall not pass!</p>"
                       "<ul>"
@@ -52,22 +54,22 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url)
 
 QCustomNetworkReply::~QCustomNetworkReply()
 {
-    delete d;
+    delete reply;
 }
 
 qint64 QCustomNetworkReply::size() const
 {
-    return d->data.size();
+    return reply->data.size();
 }
 
 void QCustomNetworkReply::abort()
 {
-    // !!! no need to implement code, but must be declared !!!
+    // !!! no need to implement code here, but must be declared !!!
 }
 
 qint64 QCustomNetworkReply::bytesAvailable() const
 {
-    return d->data.size();
+    return size();
 }
 
 bool QCustomNetworkReply::isSequential() const
@@ -82,20 +84,13 @@ qint64 QCustomNetworkReply::read(char *data, qint64 maxSize)
 
 qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 {
-    if (maxSize <= 0)
+    if (reply->offset >= reply->data.size())
     {
         return -1;
     }
 
-    if (d->data.size() > 0)
-    {
-        qint64 number = qMin(maxSize, (qint64) d->data.size());
-        memcpy(data, d->data.constData()+position, number);
-        position += number;
-        return number;
-    }
-    else
-    {
-        return -1;
-    }
+    qint64 number = qMin(maxSize, (qint64) reply->data.size() - reply->offset);
+    memcpy(data, reply->data.constData() + reply->offset, number);
+    reply->offset += number;
+    return number;
 }
