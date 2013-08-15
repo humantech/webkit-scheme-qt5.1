@@ -14,7 +14,8 @@ Just compile it using QtCreator and have some fun!
 
 - The qt-webkit discussion group;
 - My patience on reading the Qt 5.1 source code;
-- My employers for allowing me to develop this.
+- My employers for allowing me to develop this;
+- @reyesr for updating me about a bug in the code.
 
 ## License
 
